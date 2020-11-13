@@ -74,6 +74,9 @@ namespace broken_options
     public:
         std::ostream& usage(std::ostream& s = std::cout, bool print_default_group = true);
 
+        template <typename F>
+        void for_each_option(F f);
+
     private:
         void check_consistency();
 
@@ -88,9 +91,6 @@ namespace broken_options
 
         void prepare();
         void validate();
-
-        template <typename F>
-        void for_each_option(F f);
 
     private:
         std::string app_name_;
