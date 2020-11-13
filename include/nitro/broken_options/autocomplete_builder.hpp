@@ -1,9 +1,9 @@
 #pragma once
 
 #include <fstream>
+#include <nitro/broken_options/argument.hpp>
 #include <nitro/broken_options/option/base.hpp>
 #include <nitro/broken_options/parser.hpp>
-#include <nitro/env/get.hpp>
 #include <sstream>
 #include <sys/stat.h>
 
@@ -45,7 +45,6 @@ namespace broken_options
         {
         private:
             std::deque<option> opts_;
-            std::stringstream output = std::stringstream("complete -W \"");
 
         public:
             builder(nitro::broken_options::parser& parser)
@@ -55,8 +54,10 @@ namespace broken_options
                 });
             }
 
-            std::string get()
+            std::string get() const
             {
+                auto output = std::stringstream("complete -W \"");
+
                 bool first = true;
                 for (auto& opt : opts_)
                 {
@@ -79,7 +80,7 @@ namespace broken_options
             std::string script;
 
         public:
-            installer(builder args, std::string programm_name)
+            installer(builder& args, std::string programm_name)
             {
                 install_path = locate_rc_location();
                 script = prepare_script(args, programm_name);
@@ -114,7 +115,7 @@ namespace broken_options
                 }
             }
 
-            std::string prepare_script(builder args, std::string programm_name)
+            std::string prepare_script(const builder& args, std::string programm_name)
             {
                 return args.get() + " " + programm_name;
             }

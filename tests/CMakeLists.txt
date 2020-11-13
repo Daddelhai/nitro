@@ -56,3 +56,4 @@ NitroTest(format_test.cpp)
 NitroTest(string_test.cpp)
 
 NitroTest(autocomplete_test.cpp)
+target_link_libraries(Nitro.autocomplete_test Nitro::env)
