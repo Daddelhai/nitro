@@ -25,8 +25,6 @@ TEST_CASE("Autocomplete option gives correct value")
 
 TEST_CASE("Autocomplete creates correct complete command")
 {
-    std::stringstream ss{};
-
     nitro::broken_options::parser parser("app_name", "about");
     parser.option("opt1", "some opt").short_name("o");
     parser.option("opt2", "some opt");

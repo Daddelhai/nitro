@@ -92,8 +92,14 @@ namespace broken_options
                     return false;
 
                 std::ofstream fs(install_path, std::ofstream::app);
-                fs << script << std::endl;
-                fs.close();
+                if (fs.is_open())
+                {
+                    fs << script << std::endl;
+                    fs.close();
+
+                    std::cout << "[nitro] Autocompletion script successfully installed"
+                              << std::endl;
+                }
             }
 
         private:
@@ -115,9 +121,9 @@ namespace broken_options
                 }
             }
 
-            std::string prepare_script(const builder& args, std::string programm_name)
+            std::string prepare_script(const builder& builder, std::string programm_name)
             {
-                return args.get() + " " + programm_name;
+                return builder.get() + " " + programm_name;
             }
         };
 
