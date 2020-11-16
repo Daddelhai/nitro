@@ -56,7 +56,8 @@ namespace broken_options
 
             std::string get() const
             {
-                auto output = std::stringstream("complete -W \"");
+                std::stringstream output;
+                output << "complete -W \"";
 
                 bool first = true;
                 for (auto& opt : opts_)
@@ -64,6 +65,7 @@ namespace broken_options
                     if (first)
                     {
                         opt.format(output, true);
+                        first = false;
                         continue;
                     }
                     opt.format(output);
@@ -76,52 +78,85 @@ namespace broken_options
         class installer
         {
         private:
-            std::string install_path;
+            std::vector<std::string> install_path;
             std::string script;
 
         public:
-            installer(builder& args, std::string programm_name)
+            installer(const builder& args, const std::string& programm_name)
             {
                 install_path = locate_rc_location();
                 script = prepare_script(args, programm_name);
             }
 
-            bool install() const
+            void install() const
             {
                 if (install_path.empty())
-                    return false;
+                    return;
 
-                std::ofstream fs(install_path, std::ofstream::app);
-                if (fs.is_open())
+                for (const auto& path : install_path)
                 {
-                    fs << script << std::endl;
-                    fs.close();
+                    std::ofstream fs;
+                    fs.open(path, std::ofstream::app);
+                    if (fs.is_open())
+                    {
+                        fs << script << std::endl;
+                        fs.close();
 
-                    std::cout << "[nitro] Autocompletion script successfully installed"
-                              << std::endl;
+                        std::cout << "[nitro] Autocompletion script successfully installed"
+                                  << std::endl;
+                    }
+                    else
+                    {
+                        std::cout << "[nitro] Unable to opten file: " << path << std::endl;
+                    }
                 }
             }
 
+            void uninstall() const
+            {
+                /// TODO: implement
+            }
+
         private:
+            int locate_completion_script() const
+            {
+                /// TODO: implement
+                return -1;
+            }
+
             static bool file_exists(const std::string& name)
             {
                 struct stat buffer;
                 return (stat(name.c_str(), &buffer) == 0);
             }
 
-            std::string locate_rc_location()
+            std::vector<std::string> locate_rc_location()
             {
-                if (file_exists("~/.bashrc"))
+                std::vector<std::string> results;
+                std::string home = getenv("HOME");
+
+                std::cout << "[nitro] Search for .bashrc in " << home << std::endl;
+                if (file_exists(home + "/.bashrc"))
                 {
-                    return "~/.bashrc";
+                    std::cout << "[nitro] .bashrc located." << std::endl;
+                    results.emplace_back(home + "/.bashrc");
                 }
-                if (file_exists("~/.zshrc"))
+
+                std::cout << "[nitro] Search for .zshrc in " << home << std::endl;
+                if (file_exists(home + "/.zshrc"))
                 {
-                    return "~/.zshrc";
+                    std::cout << "[nitro] .zshrc located." << std::endl;
+                    results.emplace_back(home + "/.zshrc");
                 }
+
+                if (results.empty())
+                    std::cout << "[nitro] .zshrc / .bashrc not found." << std::endl;
+
+                return results;
             }
 
-            std::string prepare_script(const builder& builder, std::string programm_name)
+            std::string prepare_script(const builder& builder,
+                                       const std::string& programm_name) const
             {
                 return builder.get() + " " + programm_name;
             }
