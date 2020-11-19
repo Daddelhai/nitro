@@ -117,7 +117,7 @@ namespace broken_options
                     file << script << std::endl;
                     file.close();
 
-                    std::system(("source /etc/profile.d/" + program_name + ".bash").c_str());
+                    std::system(std::string("source /etc/profile.d/" + program_name + ".bash").c_str());
                 }
             }
 
