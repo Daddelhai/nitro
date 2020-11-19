@@ -1,12 +1,14 @@
 #pragma once
 
+#if __cplusplus >= 201703L
+
 #include <fstream>
 #include <nitro/broken_options/argument.hpp>
 #include <nitro/broken_options/option/base.hpp>
 #include <nitro/broken_options/parser.hpp>
 #include <sstream>
 #include <sys/stat.h>
-#include <system>
+#include <filesystem>
 
 namespace nitro
 {
@@ -95,7 +97,7 @@ namespace broken_options
                 std::string location = getenv("ZSH");
                 if (!location.empty())
                 {
-                    std::system( "mkdir -p " + location + "/plugins/" + program_name);
+                    std::filesystem::create_directories( location + "/plugins/" + program_name);
                     std::ifstream file(location + "/plugins/" + program_name + "/" + program_name +
                                        ".zsh");
                     if (file.is_open())
@@ -125,13 +127,13 @@ namespace broken_options
             }
 
         private:
+            /*
             static bool file_exists(const std::string& name)
             {
                 struct stat buffer;
                 return (stat(name.c_str(), &buffer) == 0);
             }
 
-            /*
             std::vector<std::string> locate_rc_location()
             {
                 std::vector<std::string> results;
@@ -168,3 +170,5 @@ namespace broken_options
     } // namespace autocompletion
 } // namespace broken_options
 } // namespace nitro
+
+#endif // CPP 17

@@ -3,6 +3,8 @@
 
 #include <nitro/broken_options/autocomplete_builder.hpp>
 
+#if __cplusplus >= 201703L
+
 TEST_CASE("Autocomplete option gives correct value")
 {
     std::stringstream ss{};
@@ -34,3 +36,5 @@ TEST_CASE("Autocomplete creates correct complete command")
 
     REQUIRE(builder.get() == "complete - W \"-o -opt1 --opt2 -u --opt3\"");
 }
+
+#endif // CPP 17
