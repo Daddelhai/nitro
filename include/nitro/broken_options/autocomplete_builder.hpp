@@ -2,13 +2,14 @@
 
 #if __cplusplus >= 201703L
 
+#include <filesystem>
 #include <fstream>
+#include <iostream>
 #include <nitro/broken_options/argument.hpp>
 #include <nitro/broken_options/option/base.hpp>
 #include <nitro/broken_options/parser.hpp>
 #include <sstream>
 #include <sys/stat.h>
-#include <filesystem>
 
 namespace nitro
 {
@@ -97,9 +98,11 @@ namespace broken_options
                 std::string location = getenv("ZSH");
                 if (!location.empty())
                 {
-                    std::filesystem::create_directories( location + "/plugins/" + program_name);
-                    std::ifstream file(location + "/plugins/" + program_name + "/" + program_name +
-                                       ".zsh");
+                    std::filesystem::create_directories(location + "/plugins/" + program_name);
+                    std::ofstream file;
+                    file.open(
+                        (location + "/plugins/" + program_name + "/" + program_name + ".zsh"));
+
                     if (file.is_open())
                     {
                         file << script << std::endl;
@@ -111,13 +114,15 @@ namespace broken_options
             void install_bash() const
             {
                 // NOT WORKING YET!!!
-                std::ofstream file("/etc/profile.d/" + program_name + ".bash");
+                std::ofstream file;
+                file.open("/etc/profile.d/" + program_name + ".bash");
                 if (file.is_open())
                 {
                     file << script << std::endl;
                     file.close();
 
-                    std::system(std::string("source /etc/profile.d/" + program_name + ".bash").c_str());
+                    std::system(
+                        std::string("source /etc/profile.d/" + program_name + ".bash").c_str());
                 }
             }
 
