@@ -6,6 +6,7 @@
 #include <nitro/broken_options/parser.hpp>
 #include <sstream>
 #include <sys/stat.h>
+#include <system>
 
 namespace nitro
 {
@@ -80,35 +81,41 @@ namespace broken_options
         private:
             std::vector<std::string> install_path;
             std::string script;
+            std::string program_name;
 
         public:
-            installer(const builder& args, const std::string& programm_name)
+            installer(const builder& args, const std::string& program_name)
+            : program_name(program_name)
             {
-                install_path = locate_rc_location();
-                script = prepare_script(args, programm_name);
+                script = prepare_script(args, program_name);
             }
 
-            void install() const
+            void install_zsh() const
             {
-                if (install_path.empty())
-                    return;
-
-                for (const auto& path : install_path)
+                std::string location = getenv("ZSH");
+                if (!location.empty())
                 {
-                    std::ofstream fs;
-                    fs.open(path, std::ofstream::app);
-                    if (fs.is_open())
+                    std::system( "mkdir -p " + location + "/plugins/" + program_name);
+                    std::ifstream file(location + "/plugins/" + program_name + "/" + program_name +
+                                       ".zsh");
+                    if (file.is_open())
                     {
-                        fs << script << std::endl;
-                        fs.close();
+                        file << script << std::endl;
+                        file.close();
+                    }
+                }
+            }
 
-                        std::cout << "[nitro] Autocompletion script successfully installed"
-                                  << std::endl;
-                    }
-                    else
-                    {
-                        std::cout << "[nitro] Unable to opten file: " << path << std::endl;
-                    }
+            void install_bash() const
+            {
+                // NOT WORKING YET!!!
+                std::ifstream file("/etc/profile.d/" + program_name + ".bash");
+                if (file.is_open())
+                {
+                    file << script << std::endl;
+                    file.close();
+
+                    std::system("source /etc/profile.d/" + program_name + ".bash")
                 }
             }
 
@@ -118,18 +125,13 @@ namespace broken_options
             }
 
         private:
-            int locate_completion_script() const
-            {
-                /// TODO: implement
-                return -1;
-            }
-
             static bool file_exists(const std::string& name)
             {
                 struct stat buffer;
                 return (stat(name.c_str(), &buffer) == 0);
             }
 
+            /*
             std::vector<std::string> locate_rc_location()
             {
                 std::vector<std::string> results;
@@ -154,6 +156,7 @@ namespace broken_options
 
                 return results;
             }
+            */
 
             std::string prepare_script(const builder& builder,
                                        const std::string& programm_name) const
