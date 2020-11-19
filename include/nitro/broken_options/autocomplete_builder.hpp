@@ -111,7 +111,7 @@ namespace broken_options
             void install_bash() const
             {
                 // NOT WORKING YET!!!
-                std::ifstream file("/etc/profile.d/" + program_name + ".bash");
+                std::ofstream file("/etc/profile.d/" + program_name + ".bash");
                 if (file.is_open())
                 {
                     file << script << std::endl;
