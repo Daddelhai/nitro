@@ -95,25 +95,42 @@ namespace broken_options
 
             void install_zsh() const
             {
-                std::string location = getenv("ZSH");
-                if (!location.empty())
+                std::cout << "[autocompletion] Search for installation path of zsh..." << std::endl;
+                try
                 {
-                    std::filesystem::create_directories(location + "/plugins/" + program_name);
-                    std::ofstream file;
-                    file.open(
-                        (location + "/plugins/" + program_name + "/" + program_name + ".zsh"));
 
-                    if (file.is_open())
+                    std::string location = getenv("ZSH");
+                    if (!location.empty())
                     {
-                        file << script << std::endl;
-                        file.close();
+                        std::cout << "[autocompletion] found!" << std::endl;
+                        std::cout << "[autocompletion] installing zsh files..." << std::endl;
+
+                        std::filesystem::create_directories(location + "/plugins/" + program_name);
+                        std::ofstream file;
+                        file.open(
+                            (location + "/plugins/" + program_name + "/" + program_name + ".zsh"));
+
+                        if (file.is_open())
+                        {
+                            file << script << std::endl;
+                            file.close();
+                            std::cout << "[autocompletion] zsh instalation successful!"
+                                      << std::endl;
+                            return;
+                        }
                     }
                 }
+                catch (const std::logic_error&)
+                {
+                }
+                std::cout << "[autocompletion] zsh instalation failed!" << std::endl;
             }
 
             void install_bash() const
             {
                 // NOT WORKING YET!!!
+                std::cout << "[autocompletion] installing bash files..." << std::endl;
+
                 std::ofstream file;
                 file.open("/etc/profile.d/" + program_name + ".bash");
                 if (file.is_open())
@@ -123,7 +140,11 @@ namespace broken_options
 
                     std::system(
                         std::string("source /etc/profile.d/" + program_name + ".bash").c_str());
+
+                    std::cout << "[autocompletion] bash instalation successful!" << std::endl;
+                    return;
                 }
+                std::cout << "[autocompletion] bash instalation failed!" << std::endl;
             }
 
             void uninstall() const
