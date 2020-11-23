@@ -2,13 +2,14 @@
 
 #if __cplusplus >= 201703L
 
+#include <filesystem>
 #include <fstream>
+#include <iostream>
 #include <nitro/broken_options/argument.hpp>
 #include <nitro/broken_options/option/base.hpp>
 #include <nitro/broken_options/parser.hpp>
 #include <sstream>
 #include <sys/stat.h>
-#include <filesystem>
 
 namespace nitro
 {
@@ -94,31 +95,52 @@ namespace broken_options
 
             void install_zsh() const
             {
-                std::string location = getenv("ZSH");
-                if (!location.empty())
+                std::cout << "[autocompletion] Search for installation path of zsh..." << std::endl;
+                try
                 {
-                    std::filesystem::create_directories( location + "/plugins/" + program_name);
-                    std::ifstream file(location + "/plugins/" + program_name + "/" + program_name +
-                                       ".zsh");
-                    if (file.is_open())
+
+                    std::string location = getenv("ZSH");
+                    if (!location.empty())
                     {
-                        file << script << std::endl;
-                        file.close();
+                        std::cout << "[autocompletion] found!" << std::endl;
+                        std::cout << "[autocompletion] installing zsh files..." << std::endl;
+
+                        std::filesystem::create_directories(location + "/plugins/" + program_name);
+                        std::ofstream file;
+                        file.open(
+                            (location + "/plugins/" + program_name + "/" + program_name + ".zsh"));
+
+                        if (file.is_open())
+                        {
+                            file << script << std::endl;
+                            file.close();
+                            std::cout << "[autocompletion] zsh instalation successful!"
+                                      << std::endl;
+                            return;
+                        }
                     }
                 }
+                catch (const std::logic_error&)
+                {
+                }
+                std::cout << "[autocompletion] zsh instalation failed!" << std::endl;
             }
 
             void install_bash() const
             {
                 if (std::filesystem::is_directory("/usr/share/doc/bash-completion"))
                 {
+                    std::cout << "[autocompletion] bash-completion: installing files..." << std::endl;
                     std::ofstream file("/usr/share/doc/bash-completion/" + program_name);
                     if (file.is_open())
                     {
                         file << script << std::endl;
                         file.close();
+                        std::cout << "[autocompletion] bash-completion: instalation successful!" << std::endl;
+                        return;
                     }
                 } else {
+                    std::cout << "[autocompletion] bash: installing files..." << std::endl;
                     std::ofstream file("/etc/profile.d/" + program_name + ".sh");
                     if (file.is_open())
                     {
@@ -126,8 +148,11 @@ namespace broken_options
                         file.close();
 
                         std::system(std::string("source /etc/profile.d/" + program_name + ".sh").c_str());
+                        std::cout << "[autocompletion] bash: instalation successful!" << std::endl;
+                        return;
                     }
                 }
+                std::cout << "[autocompletion] bash: instalation failed!" << std::endl;
             }
 
             void uninstall() const
