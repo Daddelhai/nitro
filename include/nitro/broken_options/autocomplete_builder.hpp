@@ -128,7 +128,7 @@ namespace broken_options
 
             void install_bash() const
             {
-                if (std::filesystem::is_directory("/usr/share/doc/bash-completion"))
+                /*if (std::filesystem::is_directory("/usr/share/doc/bash-completion"))
                 {
                     std::cout << "[autocompletion] bash-completion: installing files..." << std::endl;
                     std::ofstream file("/usr/share/doc/bash-completion/" + program_name);
@@ -139,7 +139,7 @@ namespace broken_options
                         std::cout << "[autocompletion] bash-completion: instalation successful!" << std::endl;
                         return;
                     }
-                } else {
+                } else {*/
                     std::cout << "[autocompletion] bash: installing files..." << std::endl;
                     std::ofstream file("/etc/profile.d/" + program_name + ".sh");
                     if (file.is_open())
@@ -151,7 +151,7 @@ namespace broken_options
                         std::cout << "[autocompletion] bash: instalation successful!" << std::endl;
                         return;
                     }
-                }
+                //}
                 std::cout << "[autocompletion] bash: instalation failed!" << std::endl;
             }
 
