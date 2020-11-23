@@ -110,14 +110,23 @@ namespace broken_options
 
             void install_bash() const
             {
-                // NOT WORKING YET!!!
-                std::ofstream file("/etc/profile.d/" + program_name + ".bash");
-                if (file.is_open())
+                if (std::filesystem::is_directory("/usr/share/doc/bash-completion"))
                 {
-                    file << script << std::endl;
-                    file.close();
+                    std::ofstream file("/usr/share/doc/bash-completion/" + program_name);
+                    if (file.is_open())
+                    {
+                        file << script << std::endl;
+                        file.close();
+                    }
+                } else {
+                    std::ofstream file("/etc/profile.d/" + program_name + ".sh");
+                    if (file.is_open())
+                    {
+                        file << script << std::endl;
+                        file.close();
 
-                    std::system(std::string("source /etc/profile.d/" + program_name + ".bash").c_str());
+                        std::system(std::string("source /etc/profile.d/" + program_name + ".sh").c_str());
+                    }
                 }
             }
 
