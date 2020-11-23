@@ -128,10 +128,10 @@ namespace broken_options
 
             void install_bash() const
             {
-                /*if (std::filesystem::is_directory("/usr/share/doc/bash-completion"))
+                /*if (std::filesystem::is_directory("/usr/share/bash-completion"))
                 {
                     std::cout << "[autocompletion] bash-completion: installing files..." << std::endl;
-                    std::ofstream file("/usr/share/doc/bash-completion/" + program_name);
+                    std::ofstream file("/usr/share/bash-completion/" + program_name);
                     if (file.is_open())
                     {
                         file << script << std::endl;
